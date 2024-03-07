@@ -88,7 +88,8 @@
    evince
    tor-browser
    flameshot
- 
+   keepassxc
+
    # fonts, icons, themes
    nerdfonts
 
@@ -185,6 +186,7 @@
 
 
 
+
 # DEVELOPING
   
   # Shell
@@ -194,7 +196,7 @@
     theme = "cloud";
   };
   users.defaultUserShell = pkgs.zsh;
- 
+
   # Docker virt enable
   virtualisation.docker.enable = true;
 
