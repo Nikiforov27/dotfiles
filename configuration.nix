@@ -22,8 +22,13 @@
   # User options 
   users.users.bodja = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "docker"]; 
+    extraGroups = [ "wheel" "networkmanager" "docker" "libvirtd"];
   };
+  
+  # USB
+  services.devmon.enable = true;
+  services.gvfs.enable = true; 
+  services.udisks2.enable = true;
   
 # SOFT
   
@@ -60,8 +65,6 @@
    rustc
    go
    python312Full
-   jdk21
-   jdk21_headless
    gcc
    python312
    python312Packages.pip
@@ -76,14 +79,13 @@
    xorg.xev
    alsa-utils
    yt-dlp
-
+   
    # GUI soft
    vlc
    chromium
-   kdePackages.dolphin
+   cinnamon.nemo
    feh
    telegram-desktop
-   lutris-unwrapped
    transmission_4-gtk
    evince
    tor-browser
@@ -98,6 +100,7 @@
    dmenu
    cmus
    picom
+   cava
 
    # annymize tools
    tor
@@ -108,13 +111,22 @@
    i2p
    i2pd
 
+   # Virtualization
+   pkgs.qemu
+   qemu
+   libvirt
+   OVMF
+   
+   # Game
+   wineWowPackages.waylandFull
+   prismlauncher
   ];
- 
-  # Discord
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-             "discord-0.0.43"
-  ];
-
+  
+  # Flatpak
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  xdg.portal.enable = true;
+  services.flatpak.enable = true;
+  
 # ENVIREMENT SETTINGS
   
   # Xserver
@@ -197,6 +209,7 @@
   };
   users.defaultUserShell = pkgs.zsh;
 
+
   # Docker virt enable
   virtualisation.docker.enable = true;
 
@@ -213,8 +226,31 @@
   };
   
 
+# VIRTUALIZATION
 
-  # Version of NixOS
+  # Libvirt enale
+  virtualisation.libvirtd = {
+    enable = true;
+    qemu = {
+      package = pkgs.qemu_kvm;
+      runAsRoot = true;
+      swtpm.enable = true;
+      ovmf = {
+        enable = true;
+        packages = [(pkgs.OVMF.override {
+          secureBoot = true;
+          tpmSupport = true;
+        }).fd];
+      };
+    };
+  };
+  
+  # Nested Virtualization
+  boot.extraModprobeConfig = "options kvm_intel nested=1";
+ 
+
+# END
+# Version of NixOS
   system.stateVersion = "23.11"; # Did you read the comment?
 
 }
